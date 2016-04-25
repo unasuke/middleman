@@ -1,5 +1,6 @@
 require 'memoist'
 require 'middleman-core/contracts'
+require 'rack/mime'
 
 # Minify CSS Extension
 class Middleman::Extensions::MinifyCss < ::Middleman::Extension
@@ -12,14 +13,7 @@ class Middleman::Extensions::MinifyCss < ::Middleman::Extension
   option :content_types, %w(text/css), 'Content types of resources that contain CSS'
   option :inline_content_types, %w(text/html text/php), 'Content types of resources that contain inline CSS'
 
-  def ready
-    # Setup Rack middleware to minify CSS
-    app.use Rack, compressor: options[:compressor],
-                  ignore: Array(options[:ignore]) + [/\.min\./],
-                  inline: options[:inline],
-                  content_types: options[:content_types],
-                  inline_content_types: options[:inline_content_types]
-  end
+  INLINE_CSS_REGEX = /(<style[^>]*>\s*(?:\/\*<!\[CDATA\[\*\/\n)?)(.*?)((?:(?:\n\s*)?\/\*\]\]>\*\/)?\s*<\/style>)/m
 
   class SassCompressor
     def self.compress(style, options={})
@@ -29,97 +23,61 @@ class Middleman::Extensions::MinifyCss < ::Middleman::Extension
     end
   end
 
-  # Rack middleware to look for CSS and compress it
-  class Rack
-    extend Memoist
-    include Contracts
-    INLINE_CSS_REGEX = /(<style[^>]*>\s*(?:\/\*<!\[CDATA\[\*\/\n)?)(.*?)((?:(?:\n\s*)?\/\*\]\]>\*\/)?\s*<\/style>)/m
+  def initialize(app, options_hash={}, &block)
+    super
 
-    # Init
-    # @param [Class] app
-    # @param [Hash] options
-    Contract RespondTo[:call], {
-      ignore: ArrayOf[PATH_MATCHER],
-      inline: Bool,
-      compressor: Or[Proc, RespondTo[:to_proc], RespondTo[:compress]]
-    } => Any
-    def initialize(app, options={})
-      @app = app
-      @ignore = options.fetch(:ignore)
-      @inline = options.fetch(:inline)
-
-      @compressor = options.fetch(:compressor)
-      @compressor = @compressor.to_proc if @compressor.respond_to? :to_proc
-      @compressor = @compressor.call if @compressor.is_a? Proc
-      @content_types = options[:content_types]
-      @inline_content_types = options[:inline_content_types]
-    end
-
-    # Rack interface
-    # @param [Rack::Environmemt] env
-    # @return [Array]
-    def call(env)
-      status, headers, response = @app.call(env)
-
-      content_type = headers['Content-Type'].try(:slice, /^[^;]*/)
-      path = env['PATH_INFO']
-
-      minified = if @inline && minifiable_inline?(content_type)
-        minify_inline(::Middleman::Util.extract_response_text(response))
-      elsif minifiable?(content_type) && !ignore?(path)
-        minify(::Middleman::Util.extract_response_text(response))
-      end
-
-      if minified
-        headers['Content-Length'] = ::Rack::Utils.bytesize(minified).to_s
-        response = [minified]
-      end
-
-      [status, headers, response]
-    end
-
-    private
-
-    # Whether the path should be ignored
-    # @param [String] path
-    # @return [Boolean]
-    def ignore?(path)
-      @ignore.any? { |ignore| ::Middleman::Util.path_match(ignore, path) }
-    end
-    memoize :ignore?
-
-    # Whether this type of content can be minified
-    # @param [String, nil] content_type
-    # @return [Boolean]
-    def minifiable?(content_type)
-      @content_types.include?(content_type)
-    end
-    memoize :minifiable?
-
-    # Whether this type of content contains inline content that can be minified
-    # @param [String, nil] content_type
-    # @return [Boolean]
-    def minifiable_inline?(content_type)
-      @inline_content_types.include?(content_type)
-    end
-    memoize :minifiable_inline?
-
-    # Minify the content
-    # @param [String] content
-    # @return [String]
-    def minify(content)
-      @compressor.compress(content)
-    end
-    memoize :minify
-
-    # Detect and minify inline content
-    # @param [String] content
-    # @return [String]
-    def minify_inline(content)
-      content.gsub(INLINE_CSS_REGEX) do
-        $1 + minify($2) + $3
-      end
-    end
-    memoize :minify_inline
+    @ignore = Array(options[:ignore]) + [/\.min\./]
+    @compressor = options[:compressor]
+    @compressor = @compressor.to_proc if @compressor.respond_to? :to_proc
+    @compressor = @compressor.call if @compressor.is_a? Proc
   end
+
+  Contract ResourceList => ResourceList
+  def manipulate_resource_list(resources)
+    resources.each do |r|
+      type = r.content_type.try(:slice, /^[^;]*/)
+      if options[:inline] && minifiable_inline?(type)
+        r.filters << method(:minify_inline)
+      elsif minifiable?(type) && !ignore?(r.destination_path)
+        r.filters << method(:minify)
+      end
+    end
+  end
+
+  # Whether the path should be ignored
+  Contract String => Bool
+  def ignore?(path)
+    @ignore.any? { |ignore| ::Middleman::Util.path_match(ignore, path) }
+  end
+  memoize :ignore?
+
+  # Whether this type of content can be minified
+  Contract Maybe[String] => Bool
+  def minifiable?(content_type)
+    options[:content_types].include?(content_type)
+  end
+  memoize :minifiable?
+
+  # Whether this type of content contains inline content that can be minified
+  Contract Maybe[String] => Bool
+  def minifiable_inline?(content_type)
+    options[:inline_content_types].include?(content_type)
+  end
+  memoize :minifiable_inline?
+
+  # Minify the content
+  Contract String => String
+  def minify(content)
+    @compressor.compress(content)
+  end
+  memoize :minify
+
+  # Detect and minify inline content
+  Contract String => String
+  def minify_inline(content)
+    content.gsub(INLINE_CSS_REGEX) do
+      $1 + minify($2) + $3
+    end
+  end
+  memoize :minify_inline
 end

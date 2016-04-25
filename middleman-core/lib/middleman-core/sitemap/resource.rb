@@ -3,7 +3,6 @@ require 'middleman-core/sitemap/extensions/traversal'
 require 'middleman-core/file_renderer'
 require 'middleman-core/template_renderer'
 require 'middleman-core/contracts'
-require 'middleman-core/pipeline'
 
 module Middleman
   # Sitemap namespace
@@ -40,8 +39,7 @@ module Middleman
       attr_reader :metadata
 
       attr_accessor :ignored
-
-      attr_reader :pipeline
+      attr_accessor :filters
 
       # Initialize resource with parent store and URL
       # @param [Middleman::Sitemap::Store] store
@@ -53,7 +51,7 @@ module Middleman
         @app         = @store.app
         @path        = path
         @ignored     = false
-        @pipeline    = Pipeline.new(self)
+        @filters     = []
 
         source = Pathname(source) if source && source.is_a?(String)
 
@@ -144,6 +142,23 @@ module Middleman
       # @return [String]
       Contract Hash, Hash => String
       def render(opts={}, locs={})
+        body = render_without_filters(opts, locs)
+
+        @filters.reduce(body) do |output, filter|
+          if filter.respond_to?(:execute_filter)
+            filter.execute_filter(output)
+          elsif filter.respond_to?(:call)
+            filter.call(output)
+          else
+            output
+          end
+        end
+      end
+
+      # Render this resource without content filters
+      # @return [String]
+      Contract Hash, Hash => String
+      def render_without_filters(opts={}, locs={})
         return ::Middleman::FileRenderer.new(@app, file_descriptor[:full_path].to_s).template_data_for_file unless template?
 
         md   = metadata
@@ -155,7 +170,7 @@ module Middleman
         opts[:layout] = false if !opts.key?(:layout) && !@app.config.extensions_with_layout.include?(ext)
 
         renderer = ::Middleman::TemplateRenderer.new(@app, file_descriptor[:full_path].to_s)
-        renderer.render(locs, opts)
+        renderer.render(locs, opts).to_str
       end
 
       # A path without the directory index - so foo/index.html becomes
