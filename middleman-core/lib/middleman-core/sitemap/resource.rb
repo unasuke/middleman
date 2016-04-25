@@ -140,12 +140,32 @@ module Middleman
 
       # Render this resource
       # @return [String]
-      Contract Hash, Hash => String
-      def render(opts={}, locs={})
+      # Contract Maybe[Hash], Maybe[Hash], Maybe[Proc] => String
+      def render(opts={}, locs={}, &block)
         body = render_without_filters(opts, locs)
 
-        @filters.reduce(body) do |output, filter|
-          if filter.respond_to?(:execute_filter)
+        return body if @filters.empty?
+
+        sortable_filters = @filters.select { |f| f.respond_to?(:filter_name) }.sort do |a, b|
+          if b.after_filter == a.filter_name
+            1
+          else
+            -1
+          end
+        end.reverse
+
+        n = 0
+        sorted_filters = @filters.sort_by do |m|
+          n += 1
+          idx = sortable_filters.index(m)
+
+          [idx.nil? ? 0 : idx, n]
+        end
+
+        sorted_filters.reduce(body) do |output, filter|
+          if block_given? && !yield(filter)
+            output
+          elsif filter.respond_to?(:execute_filter)
             filter.execute_filter(output)
           elsif filter.respond_to?(:call)
             filter.call(output)
