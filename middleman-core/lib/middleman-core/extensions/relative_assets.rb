@@ -1,5 +1,3 @@
-require 'addressable/uri'
-
 # Relative Assets extension
 class Middleman::Extensions::RelativeAssets < ::Middleman::Extension
   option :exts, nil, 'List of extensions that get converted to relative paths.'
@@ -8,17 +6,23 @@ class Middleman::Extensions::RelativeAssets < ::Middleman::Extension
   option :rewrite_ignore, [], 'Regexes of filenames to skip processing for path rewrites.'
   option :helpers_only, false, 'Allow only Ruby helpers to change paths.'
 
-  def initialize(app, options_hash={}, &block)
-    super
+  Contract ResourceList => ResourceList
+  def manipulate_resource_list(resources)
+    return resources if options[:helpers_only]
 
-    return if options[:helpers_only]
+    resources.each do |r|
+      next unless r.destination_path.end_with?('/', *options.sources)
+      next if Array(options.rewrite_ignore || []).any? do |i|
+        ::Middleman::Util.path_match(i, "/#{r.destination_path}")
+      end
 
-    app.rewrite_inline_urls id: :relative_assets,
-                            url_extensions: options.exts || app.config[:asset_extensions],
-                            source_extensions: options.sources,
-                            ignore: options.ignore,
-                            rewrite_ignore: options.rewrite_ignore,
-                            proc: method(:rewrite_url)
+      r.filters << ::Middleman::InlineURLRewriter.new(:relative_assets,
+                                                      app,
+                                                      r,
+                                                      url_extensions: options.exts || app.config[:asset_extensions],
+                                                      ignore: options.ignore,
+                                                      proc: method(:rewrite_url))
+    end
   end
 
   def mark_as_relative(file_path, opts, current_resource)

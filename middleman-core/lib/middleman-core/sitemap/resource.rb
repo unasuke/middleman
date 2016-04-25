@@ -3,6 +3,7 @@ require 'middleman-core/sitemap/extensions/traversal'
 require 'middleman-core/file_renderer'
 require 'middleman-core/template_renderer'
 require 'middleman-core/contracts'
+require 'middleman-core/inline_url_rewriter'
 
 module Middleman
   # Sitemap namespace

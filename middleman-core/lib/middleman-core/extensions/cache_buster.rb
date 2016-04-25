@@ -5,15 +5,21 @@ class Middleman::Extensions::CacheBuster < ::Middleman::Extension
   option :ignore, [], 'Regexes of filenames to skip adding query strings to'
   option :rewrite_ignore, [], 'Regexes of filenames to skip processing for path rewrites'
 
-  def initialize(app, options_hash={}, &block)
-    super
+  Contract ResourceList => ResourceList
+  def manipulate_resource_list(resources)
+    resources.each do |r|
+      next unless r.destination_path.end_with?('/', *options.sources)
+      next if Array(options.rewrite_ignore || []).any? do |i|
+        ::Middleman::Util.path_match(i, "/#{r.destination_path}")
+      end
 
-    app.rewrite_inline_urls id: :cache_buster,
-                            url_extensions: options.exts || app.config[:asset_extensions],
-                            source_extensions: options.sources,
-                            ignore: options.ignore,
-                            rewrite_ignore: options.rewrite_ignore,
-                            proc: method(:rewrite_url)
+      r.filters << ::Middleman::InlineURLRewriter.new(:cache_buster,
+                                                      app,
+                                                      r,
+                                                      url_extensions: options.exts || app.config[:asset_extensions],
+                                                      ignore: options.ignore,
+                                                      proc: method(:rewrite_url))
+    end
   end
 
   Contract String, Or[String, Pathname], Any => String
