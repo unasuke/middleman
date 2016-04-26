@@ -60,7 +60,7 @@ module Middleman
   # There are also some less common hooks that can be listened to from within an extension's `initialize` method:
   #
   # * `app.before_render {|body, path, locs, template_class| ... }` - Manipulate template sources before they are rendered.
-  # * `app.after_render {|content, path, locs, template_class| ... }` - Manipulate output text after a template has been rendered. It is also common to install a Rack middleware to do this instead.
+  # * `app.after_render {|content, path, locs, template_class| ... }` - Manipulate output text after a template has been rendered.
   # * `app.ready { ... }` - Run code once Middleman is ready to serve or build files (after `after_configuration`).
 
   #

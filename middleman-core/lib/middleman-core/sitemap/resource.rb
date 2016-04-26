@@ -46,20 +46,20 @@ module Middleman
       # @param [Middleman::Sitemap::Store] store
       # @param [String] path
       # @param [String] source
-      Contract IsA['Middleman::Sitemap::Store'], String, Maybe[Or[IsA['Middleman::SourceFile'], String]] => Any
-      def initialize(store, path, source=nil)
+      Contract IsA['Middleman::Sitemap::Store'], String, Maybe[Any] => Any
+      def initialize(store, path, source_file=nil)
         @store       = store
         @app         = @store.app
         @path        = path
         @ignored     = false
         @filters     = []
 
-        source = Pathname(source) if source && source.is_a?(String)
+        source_file = Pathname(source_file) if source_file && source_file.is_a?(String)
 
-        @file_descriptor = if source && source.is_a?(Pathname)
-          ::Middleman::SourceFile.new(source.relative_path_from(@app.source_dir), source, @app.source_dir, Set.new([:source]), 0)
+        @file_descriptor = if source_file && source_file.is_a?(Pathname)
+          ::Middleman::SourceFile.new(source_file.relative_path_from(@app.source_dir), source_file, @app.source_dir, Set.new([:source]), 0)
         else
-          source
+          source_file
         end
 
         @destination_path = @path
@@ -244,9 +244,10 @@ module Middleman
     end
 
     class StringResource < Resource
-      def initialize(store, path, contents=nil, &block)
+      Contract IsA['Middleman::Sitemap::Store'], String, Maybe[Or[String, Proc]] => Any
+      def initialize(store, path, contents)
         @request_path = path
-        @contents = block_given? ? block : contents
+        @contents = contents
         super(store, path)
       end
 
@@ -255,7 +256,28 @@ module Middleman
       end
 
       def render(*)
-        @contents.respond_to?(:call) ? @contents.call : @contents
+        @contents
+      end
+
+      def binary?
+        false
+      end
+    end
+
+    class CallbackResource < Resource
+      Contract IsA['Middleman::Sitemap::Store'], String, Proc => Any
+      def initialize(store, path, &block)
+        @request_path = path
+        @contents = block
+        super(store, path)
+      end
+
+      def template?
+        true
+      end
+
+      def render(*)
+        @contents.call
       end
 
       def binary?

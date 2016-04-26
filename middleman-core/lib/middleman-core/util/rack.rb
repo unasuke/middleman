@@ -6,20 +6,6 @@ module Middleman
 
     module_function
 
-    # Extract the text of a Rack response as a string.
-    # Useful for extensions implemented as Rack middleware.
-    # @param response The response from #call
-    # @return [String] The whole response as a string.
-    Contract RespondTo[:each] => String
-    def extract_response_text(response)
-      # The rack spec states all response bodies must respond to each
-      result = ''
-      response.each do |part, _|
-        result << part
-      end
-      result
-    end
-
     Contract String, String, ArrayOf[String], IsA['::Middleman::Application'], Proc => String
     def rewrite_paths(body, path, exts, app, &_block)
       exts = exts.sort_by(&:length).reverse

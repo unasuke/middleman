@@ -1,4 +1,3 @@
-require 'memoist'
 require 'middleman-core/contracts'
 require 'rack/mime'
 

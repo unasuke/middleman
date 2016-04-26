@@ -1,8 +1,9 @@
 master
 ===
 
-# Next
+# 4.2.0
 
+* Remove Rack support in favor of `resource.filters << proc { |oldbody| newbody }`
 * Expose `development?` and `production?` helpers to template context.
 
 # 4.1.8

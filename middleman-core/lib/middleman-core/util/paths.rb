@@ -25,7 +25,7 @@ module Middleman
     def tilt_class(path)
       ::Tilt[path]
     end
-    memoize :tilt_class
+    # memoize :tilt_class
 
     # Normalize a path to not include a leading slash
     # @param [String] path
