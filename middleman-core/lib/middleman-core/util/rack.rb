@@ -6,7 +6,7 @@ module Middleman
 
     module_function
 
-    Contract String, String, ArrayOf[String], IsA['::Middleman::Application'], Proc => String
+    Contract String, String, SetOf[String], IsA['::Middleman::Application'], Proc => String
     def rewrite_paths(body, path, exts, app, &_block)
       exts = exts.sort_by(&:length).reverse
       matcher = /([\'\"\(,]\s*|# sourceMappingURL=)([^\s\'\"\)\(>]+(#{::Regexp.union(exts)}))/

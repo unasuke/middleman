@@ -157,12 +157,12 @@ module Middleman
     define_setting :layout, :_auto_layout, 'Default layout name'
 
     # Which file extensions have a layout by default.
-    # @return [Array.<String>]
-    define_setting :extensions_with_layout, %w(.htm .html .xhtml .php), 'Which file extensions have a layout by default.'
+    # @return [Set.<String>]
+    define_setting :extensions_with_layout, %w(.htm .html .xhtml .php), 'Which file extensions have a layout by default.', set: true
 
     # Which file extensions are "assets."
     # @return [Array.<String>]
-    define_setting :asset_extensions, %w(.css .png .jpg .jpeg .webp .svg .svgz .js .gif .ttf .otf .woff .woff2 .eot .ico .map), 'Which file extensions are treated as assets.'
+    define_setting :asset_extensions, %w(.css .png .jpg .jpeg .webp .svg .svgz .js .gif .ttf .otf .woff .woff2 .eot .ico .map), 'Which file extensions are treated as assets.', set: true
 
     # Default string encoding for templates and output.
     # @return [String]

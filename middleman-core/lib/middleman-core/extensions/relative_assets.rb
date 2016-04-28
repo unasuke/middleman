@@ -1,7 +1,7 @@
 # Relative Assets extension
 class Middleman::Extensions::RelativeAssets < ::Middleman::Extension
-  option :exts, nil, 'List of extensions that get converted to relative paths.'
-  option :sources, %w(.css .htm .html .xhtml), 'List of extensions that are searched for relative assets.'
+  option :exts, nil, 'List of extensions that get converted to relative paths.', set: true
+  option :sources, %w(.css .htm .html .xhtml), 'List of extensions that are searched for relative assets.', set: true
   option :ignore, [], 'Regexes of filenames to skip converting to relative paths.'
   option :rewrite_ignore, [], 'Regexes of filenames to skip processing for path rewrites.'
   option :helpers_only, false, 'Allow only Ruby helpers to change paths.'

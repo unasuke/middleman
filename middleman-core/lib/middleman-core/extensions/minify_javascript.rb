@@ -9,8 +9,8 @@ class Middleman::Extensions::MinifyJavascript < ::Middleman::Extension
     require 'uglifier'
     ::Uglifier.new
   }, 'Set the JS compressor to use.'
-  option :content_types, %w(application/javascript), 'Content types of resources that contain JS'
-  option :inline_content_types, %w(text/html text/php), 'Content types of resources that contain inline JS'
+  option :content_types, %w(application/javascript), 'Content types of resources that contain JS', set: true
+  option :inline_content_types, %w(text/html text/php), 'Content types of resources that contain inline JS', set: true
 
   INLINE_JS_REGEX = /(<script[^>]*>\s*(?:\/\/(?:(?:<!--)|(?:<!\[CDATA\[))\n)?)(.*?)((?:(?:\n\s*)?\/\/(?:(?:-->)|(?:\]\]>)))?\s*<\/script>)/m
 

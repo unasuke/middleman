@@ -1,8 +1,8 @@
 require 'middleman-core/util'
 
 class Middleman::Extensions::AssetHash < ::Middleman::Extension
-  option :sources, %w(.css .htm .html .js .php .xhtml), 'List of extensions that are searched for hashable assets.'
-  option :exts, nil, 'List of extensions that get asset hashes appended to them.'
+  option :sources, %w(.css .htm .html .js .php .xhtml), 'List of extensions that are searched for hashable assets.', set: true
+  option :exts, nil, 'List of extensions that get asset hashes appended to them.', set: true
   option :ignore, [], 'Regexes of filenames to skip adding asset hashes to'
   option :rewrite_ignore, [], 'Regexes of filenames to skip processing for path rewrites'
 
@@ -29,7 +29,6 @@ class Middleman::Extensions::AssetHash < ::Middleman::Extension
     else
       asset_path
     end
-
 
     return unless asset_page = app.sitemap.find_resource_by_destination_path(full_asset_path) || app.sitemap.find_resource_by_path(full_asset_path)
 

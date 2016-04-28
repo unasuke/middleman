@@ -142,7 +142,7 @@ module Middleman
       # Render this resource
       # @return [String]
       # Contract Maybe[Hash], Maybe[Hash], Maybe[Proc] => String
-      def render(opts={}, locs={}, &block)
+      def render(opts={}, locs={})
         body = render_without_filters(opts, locs)
 
         return body if @filters.empty?

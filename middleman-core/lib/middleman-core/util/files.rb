@@ -56,10 +56,8 @@ module Middleman
 
     Contract String => String
     def step_through_extensions(path)
-      while ::Middleman::Util.tilt_class(path)
-        ext = ::File.extname(path)
-        break if ext.empty?
-
+      while ext = File.extname(path)
+        break if ext.empty? || !::Middleman::Util.tilt_class(ext)
         yield ext if block_given?
 
         # Strip templating extensions as long as Tilt knows them

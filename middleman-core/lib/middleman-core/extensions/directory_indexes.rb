@@ -1,3 +1,5 @@
+require 'set'
+
 # Directory Indexes extension
 class Middleman::Extensions::DirectoryIndexes < ::Middleman::Extension
   # This should run after most other sitemap manipulators so that it
@@ -11,7 +13,7 @@ class Middleman::Extensions::DirectoryIndexes < ::Middleman::Extension
     index_file = app.config[:index_file]
     new_index_path = "/#{index_file}"
 
-    extensions = %w(.htm .html .php .xhtml)
+    extensions = Set.new(%w(.htm .html .php .xhtml))
 
     resources.each do |resource|
       # Check if it would be pointless to reroute
