@@ -1,3 +1,4 @@
+require 'padrino-helpers/number_helpers'
 # This extension Gzips assets and pages when building.
 # Gzipped assets and pages can be served directly by Apache or
 # Nginx with the proper configuration, and pre-zipping means that we
