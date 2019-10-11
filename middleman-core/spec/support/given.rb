@@ -7,7 +7,10 @@ module Given
       cleanup!
 
       if RUBY_PLATFORM.match?(/mingw/)
-        `xcopy "#{File.join(ROOT, 'fixtures', name)}"  "#{TMP}" /e /d /h /r /y`
+        pp ROOT
+        pp File.join(ROOT, 'fixtures', name)
+        # `xcopy "#{File.join(ROOT, 'fixtures', name)}"  "#{TMP}" /e /d /h /r /y`
+        `robocopy #{File.join(ROOT, 'fixtures', name)} #{TMP} /s /e /R:1`
       else
         `rsync -av #{File.join(ROOT, 'fixtures', name)}/ #{TMP}/`
       end
