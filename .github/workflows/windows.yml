@@ -24,6 +24,8 @@ jobs:
           architecture: 'x64'
       - name: Install latest bundler
         run: gem install bundler
+      - name: RUBY_PLATFORM
+        run: ruby -e 'p RUBY_PLATFORM'
       - name: Install dependencies
         run: bundle install --jobs 4 --retry 3
       - name: Run test
