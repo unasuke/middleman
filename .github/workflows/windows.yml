@@ -12,6 +12,7 @@ jobs:
     strategy:
       matrix:
         ruby: ['2.5.x', '2.6.x']
+      fail-fast: false
     runs-on: windows-2019
     name: Ruby ${{ matrix.ruby }} on Windows
     steps:
