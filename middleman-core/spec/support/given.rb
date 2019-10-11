@@ -6,7 +6,11 @@ module Given
     def fixture(name)
       cleanup!
 
-      `rsync -av #{File.join(ROOT, 'fixtures', name)}/ #{TMP}/`
+      if RUBY_PLATFORM.match?(/mingw/)
+        `xcopy "#{File.join(ROOT, 'fixtures', name)}"  "#{TMP}" /e /d /h /r /y`
+      else
+        `rsync -av #{File.join(ROOT, 'fixtures', name)}/ #{TMP}/`
+      end
       Dir.chdir TMP
       ENV['MM_ROOT'] = TMP
     end
