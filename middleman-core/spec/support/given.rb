@@ -6,9 +6,9 @@ module Given
     def fixture(name)
       cleanup!
 
-      if RUBY_PLATFORM.match?(/mingw/)
-        # `xcopy "#{File.join(ROOT, 'fixtures', name)}"  "#{TMP}" /e /d /h /r /y`
-        `robocopy #{File.join(ROOT, 'fixtures', name)} #{TMP} /s /e /R:1`
+      if Gem.win_platform?
+        `xcopy "#{File.join(ROOT, 'fixtures', name)}"  "#{TMP}" /e /d /h /r /y`
+        # `robocopy #{File.join(ROOT, 'fixtures', name)} #{TMP} /e /r:1`
       else
         `rsync -av #{File.join(ROOT, 'fixtures', name)}/ #{TMP}/`
       end
