@@ -13,6 +13,7 @@ gem 'byebug'
 gem 'capybara', '~> 2.5.0', require: false
 gem 'cucumber', '~> 3.0', require: false
 gem 'rspec', '~> 3.0', require: false
+gem 'wdm', platforms: %i[mingw mswin x64_mingw]
 
 # Pry tools
 gem 'pry'
