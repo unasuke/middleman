@@ -7,8 +7,9 @@ module Given
       cleanup!
 
       if Gem.win_platform?
-        `xcopy "#{File.join(ROOT, 'fixtures', name)}"  "#{TMP}" /e /d /h /r /y`
-        # `robocopy #{File.join(ROOT, 'fixtures', name)} #{TMP} /e /r:1`
+        # `xcopy "#{File.join(ROOT, 'fixtures', name)}"  "#{TMP}" /e /d /h /r /y`
+        p "robocopy #{File.join(ROOT, 'fixtures', name)} #{TMP} /e /r:1"
+        `robocopy #{File.join(ROOT, 'fixtures', name)} #{TMP} /e /r:1`
       else
         `rsync -av #{File.join(ROOT, 'fixtures', name)}/ #{TMP}/`
       end
