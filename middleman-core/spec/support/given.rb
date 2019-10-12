@@ -38,7 +38,12 @@ module Given
 
     def cleanup!
       Dir.chdir ROOT
-      `rm -rf #{TMP}` if File.exist? TMP
+
+      if Gem.win_platform?
+        `rd /s /q #{TMP}` if File.exist? TMP
+      else
+        `rm -rf #{TMP}` if File.exist? TMP
+      end
     end
   end
 end
