@@ -1,3 +1,5 @@
+require 'fileutils'
+
 module Given
   ROOT = File.expand_path('../..', __dir__)
   TMP  = File.join(ROOT, 'tmp')
@@ -6,13 +8,14 @@ module Given
     def fixture(name)
       cleanup!
 
-      if Gem.win_platform?
-        # `xcopy "#{File.join(ROOT, 'fixtures', name)}"  "#{TMP}" /e /d /h /r /y`
-        p "robocopy #{File.join(ROOT, 'fixtures', name)} #{TMP} /e /r:1"
-        `robocopy #{File.join(ROOT, 'fixtures', name)} #{TMP} /e /r:1`
-      else
-        `rsync -av #{File.join(ROOT, 'fixtures', name)}/ #{TMP}/`
-      end
+      FileUtils.cp_r(File.join(ROOT, 'fixtures', name), TMP)
+      # if Gem.win_platform?
+      #   # `xcopy "#{File.join(ROOT, 'fixtures', name)}"  "#{TMP}" /e /d /h /r /y`
+      #   p "robocopy #{File.join(ROOT, 'fixtures', name)} #{TMP} /e /r:1"
+      #   `robocopy #{File.join(ROOT, 'fixtures', name)} #{TMP} /e /r:1`
+      # else
+      #   `rsync -av #{File.join(ROOT, 'fixtures', name)}/ #{TMP}/`
+      # end
       Dir.chdir TMP
       ENV['MM_ROOT'] = TMP
     end
@@ -39,11 +42,13 @@ module Given
     def cleanup!
       Dir.chdir ROOT
 
-      if Gem.win_platform?
-        `rd /s /q #{TMP}` if File.exist? TMP
-      else
-        `rm -rf #{TMP}` if File.exist? TMP
-      end
+      FileUtils.remove_entry_secure(TMP) if File.exist? TMP
+
+      # if Gem.win_platform?
+      #   `rd /s /q #{TMP}` if File.exist? TMP
+      # else
+      #   `rm -rf #{TMP}` if File.exist? TMP
+      # end
     end
   end
 end
