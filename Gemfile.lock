@@ -264,7 +264,6 @@ DEPENDENCIES
   slim (>= 2.0)
   stylus (>= 1.0)
   therubyrhino (>= 2.0)
-  wdm
   yard (~> 0.9.11)
 
 BUNDLED WITH
