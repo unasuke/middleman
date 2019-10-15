@@ -42,10 +42,7 @@ module Given
     def cleanup!
       Dir.chdir ROOT
 
-      if File.exist? TMP
-        pp File::Stat.new(TMP)
-        FileUtils.remove_entry_secure(TMP)
-      end
+      FileUtils.remove_entry_secure(TMP) if File.exist? TMP
 
       # if Gem.win_platform?
       #   `rd /s /q #{TMP}` if File.exist? TMP
