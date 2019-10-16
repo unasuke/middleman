@@ -1,4 +1,3 @@
-@skip-windows
 Feature: Console
 
   Scenario: Enter and exit the console

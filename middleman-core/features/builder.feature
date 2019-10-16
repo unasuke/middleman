@@ -1,4 +1,3 @@
-@skip-windows
 Feature: Builder
   In order to output static html and css for delivery
 

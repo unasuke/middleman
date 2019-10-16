@@ -1,4 +1,3 @@
-@skip-windows
 Feature: Support customizing the source directory name
 
   Scenario: Layouts don't try to build

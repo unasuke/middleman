@@ -1,4 +1,3 @@
-@skip-windows
 Feature: Build Clean
   Scenario: Build and Clean an app
     Given a fixture app "clean-app"
