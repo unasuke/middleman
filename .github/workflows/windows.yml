@@ -26,7 +26,7 @@ jobs:
         run: gem install bundler
       - name: Install dependencies
         run: bundle install --jobs 4 --retry 3
-      - name: Run test
-        run: bundle exec rake test
       - name: Run spec
         run: bundle exec rake spec
+      - name: Run test
+        run: bundle exec rake test
