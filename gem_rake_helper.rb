@@ -22,7 +22,7 @@ Cucumber::Rake::Task.new do |t|
                 else
                   ["--tags 'not @wip'"]
                 end
-  t.cucumber_opts = "--fail-fast --require features --color #{exempt_tags.join(' ')} --strict"
+  t.cucumber_opts = "--fail-fast --require features --color #{exempt_tags.join(' ')} --strict --backtrace"
 end
 
 Cucumber::Rake::Task.new(:cucumber_wip) do |t|
