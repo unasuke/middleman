@@ -24,9 +24,13 @@ jobs:
           architecture: 'x64'
       - name: Install latest bundler
         run: gem install bundler
+        shell: powershell
       - name: Install dependencies
         run: bundle install --jobs 4 --retry 3
+        shell: powershell
       - name: Run spec
         run: bundle exec rake spec
+        shell: powershell
       - name: Run test
         run: bundle exec rake test
+        shell: powershell
