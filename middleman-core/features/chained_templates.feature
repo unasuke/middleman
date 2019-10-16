@@ -1,4 +1,3 @@
-@skip-windows
 Feature: Templates should be chainable
   In order to insert variables and data in "static" engines
 
