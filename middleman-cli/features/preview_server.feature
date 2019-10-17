@@ -9,7 +9,6 @@ Feature: Run the preview server
     Given a fixture app "preview-server-app"
     And the default aruba exit timeout is 30 seconds
 
-  @skip-windows
   Scenario: Start the server with defaults
     When I run the interactive middleman server
     And I stop middleman if the output contains:
@@ -25,7 +24,6 @@ Feature: Run the preview server
     Inspect your site configuration at "http://
     """
 
-  @skip-windows
   Scenario: Start the server with defaults in verbose mode
     When I run `middleman server --verbose` interactively
     And I stop middleman if the output contains:
@@ -45,7 +43,7 @@ Feature: Run the preview server
     Inspect your site configuration at "http://
     """
 
-  @wip @skip-windows
+  @wip
   Scenario: Start the server with defaults in verbose mode, when a local mdns server resolves the local hostname
     Given I start a mdns server for the local hostname
     When I run `middleman server --verbose` interactively
@@ -319,7 +317,7 @@ Feature: Run the preview server
     Inspect your site configuration at "http://[::1]:4567/__middleman"
     """
 
-  @wip @skip-windows
+  @wip
   Scenario: Start the server with https
     When I run `middleman server --verbose --https` interactively
     And I stop middleman if the output contains:
@@ -365,7 +363,7 @@ Feature: Run the preview server
     The Middleman preview server is bound to ":::65432", "0.0.0.0:65432"
     """
 
-  @wip @skip-windows
+  @wip
   Scenario: Start the server when port is blocked by other middleman instance
     Given `middleman server` is running in background
     When I run `middleman server --verbose` interactively
@@ -443,7 +441,6 @@ Feature: Run the preview server
     Server name "garbage.example.com" does not resolve to an ip address. Please fix that and try again.
     """
 
-  @skip-windows
   Scenario: Start the server with server name "www.example.com" and the network name server is used to resolve the server name
     Given I have a local hosts file with:
     """
@@ -476,7 +473,7 @@ Feature: Run the preview server
     """
 
   @ruby-2.1
-  @wip @skip-windows
+  @wip
   Scenario: Start the server with server name "host.local" and the link local name server is used to resolve the server name
 
     To make the mdns resolver resolve a name, it needs to end with ".local".
@@ -509,7 +506,7 @@ Feature: Run the preview server
     """
 
   @ruby-2.1
-  @wip @skip-windows
+  @wip
   Scenario: Start the server with server name "host" and the link local name server is used to resolve the server name
 
     To make the mdns resolver resolve a name, it needs to end with ".local". If
