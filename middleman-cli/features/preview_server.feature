@@ -1,3 +1,4 @@
+@skip-windows
 Feature: Run the preview server
 
   As a software developer
@@ -8,6 +9,7 @@ Feature: Run the preview server
     Given a fixture app "preview-server-app"
     And the default aruba exit timeout is 30 seconds
 
+  @skip-windows
   Scenario: Start the server with defaults
     When I run the interactive middleman server
     And I stop middleman if the output contains:
@@ -23,6 +25,7 @@ Feature: Run the preview server
     Inspect your site configuration at "http://
     """
 
+  @skip-windows
   Scenario: Start the server with defaults in verbose mode
     When I run `middleman server --verbose` interactively
     And I stop middleman if the output contains:
