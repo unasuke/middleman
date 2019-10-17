@@ -10,7 +10,7 @@ init:
 
 install:
   - set PATH=C:\Ruby%RUBY_VERSION%\bin;%PATH%
-  - ps: Install-Product node Current
+  # - ps: Install-Product node Current
   - bundle config --local path vendor/bundle
   - bundle install
 
